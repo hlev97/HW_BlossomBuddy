@@ -1,6 +1,7 @@
 package com.painandpanic.blossombuddy
 
 import android.app.Application
+import com.painandpanic.blossombuddy.di.pytorchModelModule
 import com.painandpanic.blossombuddy.di.roomModule
 import com.painandpanic.blossombuddy.di.useCaseModule
 import com.painandpanic.blossombuddy.di.viewModelModule
@@ -12,7 +13,7 @@ class BlossomBuddyApp : Application() {
         super.onCreate()
         startKoin {
             androidContext(this@BlossomBuddyApp)
-            modules(listOf(useCaseModule, viewModelModule, roomModule))
+            modules(listOf(useCaseModule, viewModelModule, roomModule, pytorchModelModule))
         }
     }
 }

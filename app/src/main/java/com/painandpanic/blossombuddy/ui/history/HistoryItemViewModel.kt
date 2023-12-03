@@ -38,7 +38,7 @@ class HistoryItemViewModel(
                 uiState = uiState.copy(
                     isLoading = false,
                     classifiedPhoto = result.image,
-                    predictedLabel = result.label
+                    predictedLabels = result.labels
                 )
             }
         } catch (e: Exception) {
@@ -53,12 +53,12 @@ class HistoryItemViewModel(
 data class HistoryItemViewState(
     val isLoading: Boolean = false,
     val classifiedPhoto: Bitmap? = null,
-    val predictedLabel: String? = null,
+    val predictedLabels: Map<String,Float> = emptyMap(),
     val loadFailure: BasicStateEvent = BasicStateEvent.Captured
 ) {
 
     val isLoaded: Boolean
-        get() = classifiedPhoto != null && predictedLabel != null
+        get() = classifiedPhoto != null && predictedLabels.isNotEmpty()
     companion object {
         val Empty = HistoryItemViewState()
     }

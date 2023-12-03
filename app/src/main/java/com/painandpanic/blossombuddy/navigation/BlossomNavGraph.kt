@@ -17,6 +17,8 @@ import com.painandpanic.blossombuddy.ui.history.HistoryItem
 import com.painandpanic.blossombuddy.ui.history.HistoryItemViewModel
 import com.painandpanic.blossombuddy.ui.home.HomeScreen
 import com.painandpanic.blossombuddy.ui.home.HomeViewModel
+import com.painandpanic.blossombuddy.ui.photopicker.PhotoPicker
+import com.painandpanic.blossombuddy.ui.photopicker.PhotoPickerViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -32,17 +34,19 @@ fun BlossomNavGraph(
                 navigateToClassifier = { imageId ->
                     navController.navigate(Destination.ClassificationResult.createRoute(imageId))
                 },
-                onPhotoPicked = homeViewModel::onPhotoPicked,
                 onHistoryItemClicked = { id ->
                     navController.navigate(Destination.HistoryItem.createRoute(id))
                 },
-                onPhotoPickedFailureEventCaptured = homeViewModel::onPhotoPickedFailureCaptured,
                 onShowCameraPermissionResultSnackBarCaptured = homeViewModel::onShowPermissionResultSnackbarCaptured,
                 state = homeUiState,
                 load = homeViewModel::load,
                 showPermissionRationaleDialog = homeViewModel::showPermissionRationaleDialog,
                 hidePermissionRationaleDialog = homeViewModel::hidePermissionRationaleDialog,
-                onDismissPermissionRationaleDialog = homeViewModel::onDismissPermissionRationaleDialog
+                onDismissPermissionRationaleDialog = homeViewModel::onDismissPermissionRationaleDialog,
+                saveSelectedPhotos = homeViewModel::saveSelectedPhotos,
+                navigateToPhotoPicker = {
+                    navController.navigate(Destination.PhotoPicker.route)
+                }
             )
         }
         composable(Destination.Camera.route) {
@@ -91,6 +95,20 @@ fun BlossomNavGraph(
                 },
                 onLoadFailureCaptured = historyItemViewModel::onLoadFailureCaptured,
                 state = classificationResultUiState
+            )
+        }
+        composable(Destination.PhotoPicker.route) {
+            val photoPickerViewModel = koinViewModel<PhotoPickerViewModel>()
+            val photoPickerUiState by photoPickerViewModel.uiStateStream.collectAsState()
+            PhotoPicker(
+                onBack = {
+                    navController.popBackStack(Destination.Home.route, inclusive = true)
+                    navController.navigate(Destination.Home.route)
+                },
+                onPhotoPicked = { imageId ->
+                    navController.navigate(Destination.ClassificationResult.createRoute(imageId))
+                },
+                state = photoPickerUiState
             )
         }
     }

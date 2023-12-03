@@ -13,4 +13,6 @@ sealed class Destination(val route: String) {
         const val argName = "id"
         fun createRoute(id: Int) = "history_item/$id"
     }
+
+    data object PhotoPicker : Destination(route = "photo_picker")
 }

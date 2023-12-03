@@ -3,7 +3,7 @@ package com.painandpanic.blossombuddy.data.local.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import com.painandpanic.blossombuddy.data.local.entity.HistoryEntity
+import com.painandpanic.blossombuddy.data.local.model.HistoryEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

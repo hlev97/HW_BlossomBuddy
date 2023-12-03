@@ -8,6 +8,7 @@ import com.painandpanic.blossombuddy.domain.usecase.SavePhotoToGalleryUseCase
 import com.painandpanic.blossombuddy.domain.usecase.TakePhotoUseCase
 import com.painandpanic.blossombuddy.util.events.BasicStateEvent
 import com.painandpanic.blossombuddy.util.events.StateEventWithContent
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,12 +48,7 @@ class CameraViewModel(
             viewModelScope.launch {
                 savePhotoToGallery(uiState.lastCapturePhoto!!)
                 uiState.lastCapturePhoto?.recycle()
-                uiState = uiState.copy(isPreviewDisplayed = false)
-                delay(100)
-                uiState = uiState.copy(
-                    lastCapturePhoto = null,
-                    savePhotoSuccess = BasicStateEvent.Triggered
-                )
+                uiState = uiState.copy(isPreviewDisplayed = false,savePhotoSuccess = BasicStateEvent.Triggered)
             }
         } catch (e: Exception) {
             uiState = uiState.copy(
@@ -63,7 +59,10 @@ class CameraViewModel(
     }
 
     fun onPhotoSavedSuccesfully() {
-        uiState = uiState.copy(savePhotoSuccess = BasicStateEvent.Captured)
+        uiState = uiState.copy(
+            lastCapturePhoto = null,
+            savePhotoSuccess = BasicStateEvent.Captured
+        )
     }
 }
 

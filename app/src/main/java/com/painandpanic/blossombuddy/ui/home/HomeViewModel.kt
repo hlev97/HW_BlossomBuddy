@@ -2,7 +2,9 @@ package com.painandpanic.blossombuddy.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.painandpanic.blossombuddy.data.local.model.SelectedImage
 import com.painandpanic.blossombuddy.domain.usecase.LoadHistoryUseCase
+import com.painandpanic.blossombuddy.domain.usecase.SaveSelectedPhotosUseCase
 import com.painandpanic.blossombuddy.ui.model.HistoryUi
 import com.painandpanic.blossombuddy.ui.model.PermissionUi
 import com.painandpanic.blossombuddy.util.events.BasicStateEvent
@@ -14,7 +16,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    private val loadHistory: LoadHistoryUseCase
+    private val loadHistory: LoadHistoryUseCase,
+    private val saveSelectedImages: SaveSelectedPhotosUseCase
 ): ViewModel() {
 
     private val _uiStateStream = MutableStateFlow(HomeViewState())
@@ -33,22 +36,6 @@ class HomeViewModel(
                 history = loadHistory()
             )
         }
-    }
-
-    fun onPhotoPicked(imageId: Long?) {
-        uiState = try {
-            if (imageId != null) {
-                uiState.copy(photoPickedSuccess = StateEventWithContent.Triggered(imageId))
-            } else {
-                uiState.copy(photoPickedSuccess = StateEventWithContent.Triggered(null))
-            }
-        } catch (e: Exception) {
-            uiState.copy(photoPickedFailure = BasicStateEvent.Triggered)
-        }
-    }
-
-    fun onPhotoPickedFailureCaptured() {
-        uiState = uiState.copy(photoPickedFailure = BasicStateEvent.Captured)
     }
 
     fun onShowPermissionResultSnackbarCaptured() {
@@ -94,6 +81,12 @@ class HomeViewModel(
                     showPermissionResultSnackbar = StateEventWithContent.Triggered("Read media permission denied")
                 )
             }
+        }
+    }
+
+    fun saveSelectedPhotos(selectedPhotos: List<SelectedImage>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            saveSelectedImages(selectedPhotos)
         }
     }
 }

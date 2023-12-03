@@ -30,24 +30,6 @@ fun Context.isReadMediaPermissionPartiallyGranted(): Boolean = contentResolver.p
 fun Activity.shouldShowRequestPermissionRationale(permission: String) =
     ActivityCompat.shouldShowRequestPermissionRationale(this, permission)
 
-fun assetFilePath(context: Context, assetName: String): String {
-    val file = File(context.filesDir, assetName)
-    if (file.exists() && file.length() > 0) {
-        return file.absolutePath
-    }
-    context.assets.open(assetName).use { inputStream ->
-        FileOutputStream(file).use { os ->
-            val buffer = ByteArray(4 * 1024)
-            var read: Int
-            while (inputStream.read(buffer).also { read = it } != -1) {
-                os.write(buffer, 0, read)
-            }
-            os.flush()
-        }
-        return file.absolutePath
-    }
-}
-
 fun Bitmap.rotateBitmap(rotationDegrees: Int): Bitmap {
     val matrix = Matrix().apply {
         postRotate(-rotationDegrees.toFloat())

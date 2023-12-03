@@ -1,8 +1,5 @@
 package com.painandpanic.blossombuddy.ui.home
 
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -43,6 +40,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.painandpanic.blossombuddy.data.local.model.SelectedImage
 import com.painandpanic.blossombuddy.ui.core.permissions.RequestMultiplePermissions
 import com.painandpanic.blossombuddy.ui.model.PermissionUi
 import com.painandpanic.blossombuddy.ui.theme.BlossomBuddyTheme
@@ -54,14 +52,14 @@ import com.painandpanic.blossombuddy.util.events.NavigationEventEffect
 fun HomeScreen(
     modifier: Modifier = Modifier,
     navigateToCamera: () -> Unit,
+    navigateToPhotoPicker: () -> Unit,
     navigateToClassifier: (Long) -> Unit,
-    onPhotoPicked: (Long) -> Unit,
     onHistoryItemClicked: (Int) -> Unit,
-    onPhotoPickedFailureEventCaptured: () -> Unit,
     onShowCameraPermissionResultSnackBarCaptured: () -> Unit,
     showPermissionRationaleDialog: (PermissionUi) -> Unit,
     hidePermissionRationaleDialog: (PermissionUi) -> Unit,
     onDismissPermissionRationaleDialog: (PermissionUi) -> Unit,
+    saveSelectedPhotos: (List<SelectedImage>) -> Unit,
     load: () -> Unit,
     state: HomeViewState,
 ) {
@@ -70,31 +68,14 @@ fun HomeScreen(
         state = state,
         showPermissionRationaleDialog = showPermissionRationaleDialog,
         onOkClick = hidePermissionRationaleDialog,
-        onDismiss = onDismissPermissionRationaleDialog
-    )
-
-    val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { result ->
-            result?.let {
-                onPhotoPicked(it.lastPathSegment!!.toLong())
-            }
-        }
+        onDismiss = onDismissPermissionRationaleDialog,
+        saveSelectedPhotos = saveSelectedPhotos
     )
 
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         load()
-    }
-
-    EventEffect(
-        event = state.photoPickedFailure,
-        onConsumed = onPhotoPickedFailureEventCaptured
-    ) {
-        snackbarHostState.showSnackbar(
-            message = "Welcome to Blossom Buddy!"
-        )
     }
 
     EventEffect(
@@ -138,20 +119,14 @@ fun HomeScreen(
                     )
                     Spacer(modifier = Modifier.padding(horizontal = 8.dp))
                     FilledIconButton(
-                        onClick = {
-                            navigateToCamera()
-                        },
+                        onClick = navigateToCamera,
                         modifier = Modifier.weight(1f)
                     ) {
                         Image(imageVector = Icons.Outlined.CameraAlt, contentDescription = null)
                     }
                     Spacer(modifier = Modifier.padding(horizontal = 8.dp))
                     OutlinedIconButton(
-                        onClick = {
-                            singlePhotoPickerLauncher.launch(
-                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                            )
-                        },
+                        onClick = navigateToPhotoPicker,
                         modifier = Modifier.weight(1f)
                     ) {
                         Image(imageVector = Icons.Outlined.Image, contentDescription = null)
@@ -196,7 +171,7 @@ fun HomeScreen(
                         items(state.history) { item ->
                             ListItem(
                                 headlineContent = { Text(
-                                    text = item.label,
+                                    text = item.labels.keys.first(),
                                     style = MaterialTheme.typography.titleLarge
                                 ) },
                                 modifier = Modifier
@@ -238,15 +213,15 @@ fun HomeScreen_Preview() {
         HomeScreen(
             navigateToCamera = { /*TODO*/ },
             navigateToClassifier = {},
-            onPhotoPicked = { /*TODO*/ },
             onHistoryItemClicked = { /*TODO*/ },
-            onPhotoPickedFailureEventCaptured = { /*TODO*/ },
+            navigateToPhotoPicker = { /*TODO*/ },
             onShowCameraPermissionResultSnackBarCaptured = { /*TODO*/ },
             state = HomeViewState(),
             load = {},
             showPermissionRationaleDialog = { /*TODO*/ },
             hidePermissionRationaleDialog = { /*TODO*/ },
             onDismissPermissionRationaleDialog = { /*TODO*/ },
+            saveSelectedPhotos = { /*TODO*/ }
         )
     }
 }

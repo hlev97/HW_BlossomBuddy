@@ -79,9 +79,14 @@ dependencies {
     implementation(libs.koin.compose)
     implementation(libs.koin.compose.navigation)
 
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
+    implementation(libs.koin.compose)
+    implementation(libs.koin.compose.navigation)
+
     implementation(libs.coil.compose)
 
-    implementation(libs.accompanist.permissions)
+    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
@@ -90,6 +95,7 @@ dependencies {
     androidTestImplementation(libs.ui.test.junit4)
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
+
 
     implementation(libs.pytorch.android.lite)
     implementation(libs.pytorch.android.torchvision)

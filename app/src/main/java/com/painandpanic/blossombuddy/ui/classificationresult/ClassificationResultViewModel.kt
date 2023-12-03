@@ -1,7 +1,6 @@
 package com.painandpanic.blossombuddy.ui.classificationresult
 
 import android.graphics.Bitmap
-import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -47,11 +46,11 @@ class ClassificationResultViewModel(
                 val result = vulkanMutex.withLock {
                     classifyImage(imageId)
                 }
-                saveToHistory(HistoryDomain(imageId = imageId, predictedLabel =  result.third, timestamp = LocalDateTime.now()))
+                saveToHistory(HistoryDomain(imageId = imageId, predictedLabels =  result.third, timestamp = LocalDateTime.now()))
                 uiState.copy(
                     isLoading = false,
                     photoToClassify = result.first,
-                    predictedLabel = result.third
+                    predictedLabels = result.third
                 )
             } catch (e: Exception) {
                 Log.e("error", e.stackTraceToString())
@@ -76,9 +75,9 @@ class ClassificationResultViewModel(
 data class ClassificationResultViewState(
     val isLoading: Boolean = false,
     val photoToClassify: Bitmap? = null,
-    val predictedLabel: String? = null,
+    val predictedLabels: Map<String,Float> = emptyMap(),
     val classifyImageFailure: BasicStateEvent = BasicStateEvent.Captured,
 ) {
     val isPhotoPredicted
-        get() = photoToClassify != null && predictedLabel != null
+        get() = photoToClassify != null && predictedLabels.isNotEmpty()
 }

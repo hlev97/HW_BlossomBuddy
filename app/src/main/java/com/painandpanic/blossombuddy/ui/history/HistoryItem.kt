@@ -23,6 +23,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import com.painandpanic.blossombuddy.R
 
 @Composable
 fun HistoryItem(
@@ -30,6 +33,8 @@ fun HistoryItem(
     onBack: () -> Unit,
     onLoadFailureCaptured: () -> Unit
 ) {
+
+    val context = LocalContext.current
     Scaffold(
         topBar = {
             if (!state.isLoading) {
@@ -64,14 +69,25 @@ fun HistoryItem(
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
                         .clip(CircleShape)
                         .aspectRatio(1f)
-                        .fillMaxWidth()
+
                 )
-                Text(
-                    text = state.predictedLabel ?: "No prediction",
-                    color = Color.Black
-                )
+                if (state.predictedLabels.isEmpty()) {
+                    Text(
+                        text = context.getString(R.string.no_prediction),
+                        color = Color.Black
+                    )
+                } else {
+                    for (label in state.predictedLabels) {
+                        Text(
+                            text = "${label.key} - ${label.value}",
+                            color = Color.Black
+                        )
+                    }
+                }
             }
         } else {
             Column(
@@ -81,7 +97,7 @@ fun HistoryItem(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceEvenly
             ) {
-                Text(text = "Something went wrong")
+                Text(text = context.getString(R.string.something_went_wrong))
             }
         }
     }

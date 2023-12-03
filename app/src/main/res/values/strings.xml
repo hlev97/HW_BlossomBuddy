@@ -109,11 +109,13 @@
         <item>Blackberry lily</item>
     </string-array>
     <string name="camera_permission_title">Camera</string>
-    <string name="camera_permission_rationale">Camera rationale</string>
+    <string name="camera_permission_rationale">This permission allows the app to use your device\'s camera for capturing photos and videos.</string>
     <string name="read_media_images_permission_title">Read Media Images</string>
-    <string name="read_media_images_permission_rationale">Read media images rationale</string>
+    <string name="read_media_images_permission_rationale">Granting this permission enables the app to access and display images from your device\'s gallery or media library. This is useful for selecting images to upload, share, or use within the app.</string>
     <string name="read_media_visual_user_selected_permission_title">Read Media Visual User Selected</string>
-    <string name="read_media_visual_user_selected_permission_rationale">Read media user selected rationale</string>
+    <string name="read_media_visual_user_selected_permission_rationale">This permission allows the app to access media files like photos and videos that you specifically choose. It ensures your privacy by not accessing your entire media library, only the files you select to use with this app.</string>
     <string name="read_external_storage_permission_title">Read external storage</string>
-    <string name="read_external_storage_permission_rationale">Read external storage rationale</string>
+    <string name="read_external_storage_permission_rationale">By allowing this permission, the app can read files from your device\'s external storage, such as a SD card. This is necessary for features that involve importing or accessing documents, photos, or other media stored outside the device\'s internal memory.</string>
+    <string name="no_prediction">No predictions</string>
+    <string name="something_went_wrong">Something went wrong</string>
 </resources>

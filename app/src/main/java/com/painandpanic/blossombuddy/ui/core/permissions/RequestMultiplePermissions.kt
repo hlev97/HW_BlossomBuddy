@@ -13,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
+import com.painandpanic.blossombuddy.data.local.contentresolver.queryContentResolver
+import com.painandpanic.blossombuddy.data.local.model.SelectedImage
 import com.painandpanic.blossombuddy.ui.home.HomeViewState
 import com.painandpanic.blossombuddy.ui.model.PermissionUi
 import com.painandpanic.blossombuddy.ui.model.PermissionUi.Companion.permissionUi
@@ -24,8 +26,10 @@ import com.painandpanic.blossombuddy.util.openAppSettings
 fun RequestMultiplePermissions(
     state: HomeViewState,
     showPermissionRationaleDialog: (PermissionUi) -> Unit,
+    saveSelectedPhotos: (List<SelectedImage>) -> Unit,
     onOkClick: (PermissionUi) -> Unit,
     onDismiss: (PermissionUi) -> Unit,
+
 ) {
     val context = LocalContext.current
     val activity = context as Activity
@@ -50,8 +54,33 @@ fun RequestMultiplePermissions(
 
     val requestMultiplePermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        permissions.forEach { (permission, isGranted) ->
+    ) { results ->
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            if (results.values.any { it }) {
+                queryContentResolver(context) { imageModels ->
+                    saveSelectedPhotos(imageModels)
+                }
+            } else {
+                results.forEach { (permission, isGranted) ->
+                    val permissionUi = permission.permissionUi()
+                    if (!isGranted) {
+                        if (shouldShowRequestPermissionRationale(activity, permission)) {
+                            permissionUi?.let(showPermissionRationaleDialog)
+                        }
+                    }
+                }
+            }
+        } else {
+            results.forEach { (permission, isGranted) ->
+                val permissionUi = permission.permissionUi()
+                if (!isGranted) {
+                    if (shouldShowRequestPermissionRationale(activity, permission)) {
+                        permissionUi?.let(showPermissionRationaleDialog)
+                    }
+                }
+            }
+        }
+        results.forEach { (permission, isGranted) ->
             val permissionUi = permission.permissionUi()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 if (permission == Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) {

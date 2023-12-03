@@ -15,11 +15,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
-import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
-import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -28,7 +24,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.Close
@@ -41,13 +36,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
@@ -111,8 +103,8 @@ fun CameraScreen(
             AnimatedVisibility (
                 visible = state.isPreviewDisplayed,
                 modifier = Modifier.align(Alignment.BottomStart),
-                enter = fadeIn() + slideInHorizontally { width -> -width },
-                exit = fadeOut() + slideOutHorizontally { width -> width }
+                enter = slideInHorizontally { width -> width } + fadeIn(),
+                exit = slideOutHorizontally { width -> width } + fadeOut()
             ) {
                 LastCapturedPhotoPreview(
                     modifier = Modifier.align(Alignment.BottomStart),
@@ -154,14 +146,21 @@ fun LastCapturedPhotoPreview(
     onClick: () -> Unit
 ) {
     val capturedPhoto: ImageBitmap = remember(lastCapturedPhoto.hashCode()) { lastCapturedPhoto.asImageBitmap() }
-    var isPressed by remember { mutableStateOf(false) }
-    val alpha by animateFloatAsState(targetValue = if (isPressed) 0.5f else 1f, label = "")
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val iconAlpha by animateFloatAsState(targetValue = if (!isPressed) 0.5f else 1f, label = "")
+    val filterAlpha by animateFloatAsState(targetValue = if (!isPressed) 0f else 0.5f, label = "")
+
     Card(
         modifier = modifier
             .size(128.dp)
             .padding(16.dp)
             .clip(MaterialTheme.shapes.large)
-            .clickable(onClick = onClick),
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = onClick
+            ),
         elevation = CardDefaults.elevatedCardElevation(),
         shape = MaterialTheme.shapes.large,
     ) {
@@ -169,13 +168,19 @@ fun LastCapturedPhotoPreview(
             Image(
                 bitmap = capturedPhoto,
                 contentDescription = "Last captured photo",
-                contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+            )
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = filterAlpha))
             )
 
             Icon(
                 imageVector = Icons.Default.Save,
                 contentDescription = "Save",
-                tint = MaterialTheme.colorScheme.primaryContainer.copy(alpha = alpha),
+                tint = MaterialTheme.colorScheme.onPrimary.copy(alpha = iconAlpha),
             )
         }
     }

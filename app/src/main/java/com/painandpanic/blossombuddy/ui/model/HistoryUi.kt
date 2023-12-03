@@ -5,6 +5,6 @@ import android.graphics.Bitmap
 data class HistoryUi(
     val image: Bitmap,
     val imageID: Long,
-    val label: String,
+    val labels: Map<String,Float>,
     val timestamp: String
 )
